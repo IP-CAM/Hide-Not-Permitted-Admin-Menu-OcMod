@@ -1,0 +1,62 @@
+<modification>
+	<name>Jimmy Hide Not Perimited Admin Menu</name>
+	<code>jimmy_hide_admin_menu</code>
+	<author>Jimmy Hoang</author>
+	<link>http://www.hmphu.com</link>
+	<version>1.0</version>
+		
+	<file path="system/library/user.php">
+		<operation error="skip">
+			<search  index="0"><![CDATA[public function getUserName() {]]></search>
+			<add position="before"><![CDATA[
+				public function getAccessPermissions() {
+					return isset($this->permission['access']) ? $this->permission['access'] : array();
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/controller/common/header.php">
+		<operation error="skip">
+			<search  index="0"><![CDATA[return $this->load->view('common/header.tpl', $data);]]></search>
+			<add position="before"><![CDATA[
+				$data['access_permissions'] = $this->user->getAccessPermissions();				
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/view/template/common/header.tpl">
+		<operation>
+			<search  index="0"><![CDATA[</head>]]></search>
+			<add position="before"><![CDATA[
+				<script type="text/javascript">
+					$(document).ready(function() {
+						var access_permissions = <?= json_encode($access_permissions) ?>;
+						access_permissions.push('common/home');
+											
+						$('#column-left #menu a[href*="?route="]').each(function() {
+							var route = $(this).attr('href').match(/\?route=(.*)\&/);
+							if(route && route.length) {
+								str = route[1]; //.replace('/', '\/');						
+								if(access_permissions.indexOf(str) == -1) {
+									$(this).parent('li').remove();
+								}
+							}
+						});
+						
+						cleanup_menu = function() {
+							var elements = $('#column-left #menu ul:not(:has(li))');
+							if(elements.length) {
+								elements.parent('li').remove();
+								cleanup_menu();
+							}
+						}
+						
+						cleanup_menu();
+						
+					});
+				</script>
+		]]></add>
+		</operation>
+	</file>
+</modification>
