@@ -1,2 +1,2 @@
-# opencart_ocmod
-Opencart OCMOD
+# Opencart OCMOD By Jimmy Hoang
+- Hide Not Permitted Admin Menu
